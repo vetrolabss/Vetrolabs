@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Vetro Labs - Get In Touch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 50%, #00D4FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .glow-effect:hover {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+        
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+        
+        .form-input {
+            background: rgba(11, 20, 38, 0.8);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #00D4FF;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        
+        .contact-card {
+            background: rgba(11, 20, 38, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            border-bottom-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+        }
+        
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-cyan-500/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold gradient-text">Vetro Labs</a>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="hover:text-cyan-400 transition-colors">Home</a>
+                    <a href="about.html" class="hover:text-cyan-400 transition-colors">About</a>
+                    <a href="services.html" class="hover:text-cyan-400 transition-colors">Services</a>
+                    <a href="contact.html" class="text-cyan-400">Contact</a>
+                </div>
+                <button class="glow-effect bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded-lg font-semibold">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h1 class="text-5xl lg:text-7xl font-black mb-6">
+                    <span class="gradient-text">Get In Touch</span><br>
+                    <span class="text-white">Let's Build Together</span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Have questions about our AI tools? Ready to transform your development workflow? 
+                    We're here to help you accelerate your journey.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Methods -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="contact-card p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-4">Email Us</h3>
+                    <p class="text-gray-300 mb-4">
+                        Get in touch with our team for general inquiries, partnerships, or support.
+                    </p>
+                    <a href="mailto:hello@vetrolabs.com" class="text-cyan-400 hover:text-cyan-300 font-semibold">
+                        hello@vetrolabs.com
+                    </a>
+                </div>
+                
+                <div class="contact-card p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-4">Live Chat</h3>
+                    <p class="text-gray-300 mb-4">
+                        Chat with our AI assistant or speak with a human expert in real-time.
+                    </p>
+                    <button class="text-cyan-400 hover:text-cyan-300 font-semibold">
+                        Start Chat →
+                    </button>
+                </div>
+                
+                <div class="contact-card p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-4">Schedule Call</h3>
+                    <p class="text-gray-300 mb-4">
+                        Book a personalized demo or consultation with our product specialists.
+                    </p>
+                    <button class="text-cyan-400 hover:text-cyan-300 font-semibold">
+                        Book Now →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form -->
+    <section class="py-20 bg-gray-800/50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">Send Us a Message</h2>
+                <p class="text-xl text-gray-300">Tell us about your project and how we can help</p>
+            </div>
+            
+            <form class="space-y-6 scroll-reveal" id="contact-form">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-cyan-400 mb-2">First Name</label>
+                        <input 
+                            type="text" 
+                            name="firstName" 
+                            required
+                            class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400"
+                            placeholder="John"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-cyan-400 mb-2">Last Name</label>
+                        <input 
+                            type="text" 
+                            name="lastName" 
+                            required
+                            class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400"
+                            placeholder="Doe"
+                        >
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-cyan-400 mb-2">Email</label>
+                        <input 
+                            type="email" 
+                            name="email" 
+                            required
+                            class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400"
+                            placeholder="john@example.com"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-cyan-400 mb-2">Company</label>
+                        <input 
+                            type="text" 
+                            name="company" 
+                            class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400"
+                            placeholder="Your Company"
+                        >
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-cyan-400 mb-2">Subject</label>
+                    <select 
+                        name="subject" 
+                        required
+                        class="form-input w-full px-4 py-3 rounded-lg text-white"
+                    >
+                        <option value="">Select a topic</option>
+                        <option value="general">General Inquiry</option>
+                        <option value="demo">Request Demo</option>
+                        <option value="support">Technical Support</option>
+                        <option value="partnership">Partnership</option>
+                        <option value="pricing">Pricing Information</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-cyan-400 mb-2">Message</label>
+                    <textarea 
+                        name="message" 
+                        required
+                        rows="6"
+                        class="form-input w-full px-4 py-3 rounded-lg text-white placeholder-gray-400 resize-none"
+                        placeholder="Tell us about your project, goals, or how we can help you..."
+                    ></textarea>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <input 
+                        type="checkbox" 
+                        id="newsletter" 
+                        name="newsletter"
+                        class="w-5 h-5 text-cyan-500 bg-gray-800 border-gray-600 rounded focus:ring-cyan-500"
+                    >
+                    <label for="newsletter" class="text-gray-300">
+                        Subscribe to our newsletter for updates on new features and AI developments
+                    </label>
+                </div>
+                
+                <div class="text-center">
+                    <button 
+                        type="submit" 
+                        class="glow-effect bg-cyan-500 hover:bg-cyan-600 px-8 py-4 rounded-lg font-bold text-lg"
+                    >
+                        Send Message
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">Frequently Asked Questions</h2>
+                <p class="text-xl text-gray-300">Quick answers to common questions</p>
+            </div>
+            
+            <div class="space-y-4 scroll-reveal">
+                <div class="faq-item bg-gray-800/50 rounded-lg p-6 cursor-pointer">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">How does VetroGPT work?</h3>
+                        <div class="faq-icon w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center transition-transform duration-300">
+                            <div class="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-300">
+                            VetroGPT uses advanced natural language processing and machine learning models trained on millions of code examples. It understands your requirements in plain English and generates production-ready code that follows best practices and industry standards.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-800/50 rounded-lg p-6 cursor-pointer">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">What programming languages are supported?</h3>
+                        <div class="faq-icon w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center transition-transform duration-300">
+                            <div class="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-300">
+                            We currently support JavaScript, TypeScript, Python, Java, C#, Go, Rust, and PHP. We're constantly expanding our language support based on user feedback and market demands.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-800/50 rounded-lg p-6 cursor-pointer">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">Is my code secure and private?</h3>
+                        <div class="faq-icon w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center transition-transform duration-300">
+                            <div class="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-300">
+                            Absolutely. We use enterprise-grade encryption and security measures. Your code is never stored permanently or used to train our models. We offer both cloud and on-premise deployment options for maximum security.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-800/50 rounded-lg p-6 cursor-pointer">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">Can I customize the generated code?</h3>
+                        <div class="faq-icon w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center transition-transform duration-300">
+                            <div class="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-300">
+                            Yes! All generated code is fully editable and customizable. You can also provide specific style guidelines, coding standards, and architectural patterns that VetroGPT will follow when generating code for your projects.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-800/50 rounded-lg p-6 cursor-pointer">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">What kind of support do you offer?</h3>
+                        <div class="faq-icon w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center transition-transform duration-300">
+                            <div class="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-300">
+                            We offer 24/7 support through multiple channels including live chat, email, and scheduled calls. Professional and Enterprise plans include priority support with dedicated account managers and technical specialists.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="faq-item bg-gray-800/50 rounded-lg p-6 cursor-pointer">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-white">How do I get started?</h3>
+                        <div class="faq-icon w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center transition-transform duration-300">
+                            <div class="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-300">
+                            Getting started is easy! Sign up for a free trial to explore our features, or book a demo with our team to see how Vetro Labs can transform your development workflow. No credit card required for the trial.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Office Locations -->
+    <section class="py-20 bg-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">Our Locations</h2>
+                <p class="text-xl text-gray-300">Global presence, local support</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="contact-card p-8 rounded-2xl text-center scroll-reveal">
+                    <h3 class="text-xl font-bold gradient-text mb-4">San Francisco</h3>
+                    <p class="text-gray-300 mb-2">123 Innovation Drive</p>
+                    <p class="text-gray-300 mb-2">San Francisco, CA 94105</p>
+                    <p class="text-gray-400 text-sm">Headquarters</p>
+                </div>
+                
+                <div class="contact-card p-8 rounded-2xl text-center scroll-reveal">
+                    <h3 class="text-xl font-bold gradient-text mb-4">London</h3>
+                    <p class="text-gray-300 mb-2">456 Tech Square</p>
+                    <p class="text-gray-300 mb-2">London, UK EC2A 4DP</p>
+                    <p class="text-gray-400 text-sm">EMEA Operations</p>
+                </div>
+                
+                <div class="contact-card p-8 rounded-2xl text-center scroll-reveal">
+                    <h3 class="text-xl font-bold gradient-text mb-4">Singapore</h3>
+                    <p class="text-gray-300 mb-2">789 Future Tower</p>
+                    <p class="text-gray-300 mb-2">Singapore 018989</p>
+                    <p class="text-gray-400 text-sm">APAC Headquarters</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold gradient-text mb-4">Vetro Labs</h3>
+                <p class="text-gray-400">The AI Engine for Next-Generation Builders</p>
+            </div>
+            <div class="text-gray-500">
+                © 2025 Vetro Labs. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ Accordion
+        document.addEventListener('DOMContentLoaded', () => {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close all FAQ items
+                    faqItems.forEach(faq => faq.classList.remove('active'));
+                    
+                    // Open clicked item if it wasn't active
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // Form submission
+            const contactForm = document.getElementById('contact-form');
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Simulate form submission
+                const submitButton = contactForm.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                
+                submitButton.textContent = 'Sending...';
+                submitButton.disabled = true;
+                
+                setTimeout(() => {
+                    alert('Thank you for your message! We\'ll get back to you soon.');
+                    contactForm.reset();
+                    submitButton.textContent = originalText;
+                    submitButton.disabled = false;
+                }, 2000);
+            });
+
+            // Scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.scroll-reveal').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
