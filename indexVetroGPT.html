@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetroGPT - AI Code Generation by Vetro Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .hero-bg {
+            background: url('resources/hero-bg.jpg') center/cover;
+            position: relative;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 10, 0.7);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glow {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background: rgba(10, 10, 10, 0.8);
+        }
+        
+        .metric-counter {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #00D4FF;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-text">VetroGPT</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-white hover:text-blue-400 transition-colors">Home</a>
+                    <a href="#demo" class="text-white hover:text-blue-400 transition-colors">Demo</a>
+                    <a href="#about" class="text-white hover:text-blue-400 transition-colors">About</a>
+                    <a href="https://vetrolabs.vercel.app/" target="_blank" class="text-white hover:text-blue-400 transition-colors">VetroLabs</a>
+                    <button onclick="window.open('https://vetrolabs.vercel.app/', '_blank')" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all glow">
+                        Launch AI Forge
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg min-h-screen flex items-center justify-center pt-16">
+        <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="animate-float">
+                <h1 class="text-5xl md:text-7xl font-bold text-white mb-6">
+                    Transform Ideas Into
+                    <span class="gradient-text">Code</span>
+                </h1>
+                <div class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    <span id="typed-text"></span>
+                </div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                <button onclick="scrollToDemo()" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all glow">
+                    Try Live Demo
+                </button>
+                <button onclick="window.open('https://vetrolabs.vercel.app/', '_blank')" class="border-2 border-blue-500 text-blue-400 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-500 hover:text-white transition-all">
+                    Visit VetroLabs
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+                <div class="text-center">
+                    <div class="metric-counter" data-target="12">0</div>
+                    <p class="text-gray-400 text-lg">% Faster Setup</p>
+                </div>
+                <div class="text-center">
+                    <div class="metric-counter" data-target="10">0</div>
+                    <p class="text-gray-400 text-lg">X Development Speed</p>
+                </div>
+                <div class="text-center">
+                    <div class="metric-counter" data-target="99">0</div>
+                    <p class="text-gray-400 text-lg">% Code Accuracy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Tools Showcase -->
+    <section id="demo" class="py-20 bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    AI Tools for <span class="gradient-text">Builders</span>
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Transform your ideas into reality with our suite of AI-powered development tools
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card-hover bg-gray-800/50 p-8 rounded-xl border border-gray-700">
+                    <div class="text-blue-400 text-4xl mb-4">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">VetroGPT</h3>
+                    <p class="text-gray-400 mb-6">
+                        Your AI copilot that turns natural language into executable code. Describe what you need and watch it build, test, and deploy automatically.
+                    </p>
+                    <button class="text-blue-400 hover:text-blue-300 font-semibold">
+                        Try Live Preview →
+                    </button>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-xl border border-gray-700">
+                    <div class="text-blue-400 text-4xl mb-4">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Code Forge</h3>
+                    <p class="text-gray-400 mb-6">
+                        Advanced code scaffolding with AI-powered optimization. Generate production-ready applications with best practices built-in.
+                    </p>
+                    <button class="text-blue-400 hover:text-blue-300 font-semibold">
+                        Try Demo →
+                    </button>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-xl border border-gray-700">
+                    <div class="text-blue-400 text-4xl mb-4">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Smart Deploy</h3>
+                    <p class="text-gray-400 mb-6">
+                        Intelligent deployment pipeline with automated testing, optimization, and monitoring for peak performance.
+                    </p>
+                    <button class="text-blue-400 hover:text-blue-300 font-semibold">
+                        Learn More →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Generation Interface -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    See It In <span class="gradient-text">Action</span>
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Experience the power of AI-driven development with real-time code generation
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="space-y-6">
+                    <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+                        <h3 class="text-xl font-semibold text-white mb-4">Natural Language Input</h3>
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <p class="text-gray-300 italic">
+                                "Generate a React component for a todo app with add, delete, and toggle functionality"
+                            </p>
+                        </div>
+                        <button onclick="generateCode()" class="mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                            Generate Code
+                        </button>
+                    </div>
+                    
+                    <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
+                        <h3 class="text-xl font-semibold text-white mb-4">AI Features</h3>
+                        <ul class="space-y-2 text-gray-400">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-400 mr-2"></i>
+                                Natural language to code conversion
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-400 mr-2"></i>
+                                Automatic testing and validation
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-400 mr-2"></i>
+                                Performance optimization
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-green-400 mr-2"></i>
+                                Multi-language support
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="code-block p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Generated Code</span>
+                        <button onclick="copyCode()" class="text-blue-400 hover:text-blue-300 text-sm">
+                            <i class="fas fa-copy mr-1"></i>Copy
+                        </button>
+                    </div>
+                    <pre id="generated-code" class="text-sm text-gray-300 overflow-x-auto"><code>import React, { useState } from 'react';
+
+const TodoApp = () => {
+  const [todos, setTodos] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+
+  const addTodo = () => {
+    if (inputValue.trim()) {
+      setTodos([...todos, {
+        id: Date.now(),
+        text: inputValue,
+        completed: false
+      }]);
+      setInputValue('');
+    }
+  };
+
+  const deleteTodo = (id) => {
+    setTodos(todos.filter(todo => todo.id !== id));
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(todos.map(todo => 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
+  };
+
+  return (
+    &lt;div className="todo-app"&gt;
+      &lt;h1&gt;Todo App&lt;/h1&gt;
+      &lt;div className="input-section"&gt;
+        &lt;input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Add a new todo..."
+        /&gt;
+        &lt;button onClick={addTodo}&gt;Add&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div className="todos-list"&gt;
+        {todos.map(todo => (
+          &lt;div key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}&gt;
+            &lt;span onClick={() => toggleTodo(todo.id)}&gt;{todo.text}&lt;/span&gt;
+            &lt;button onClick={() => deleteTodo(todo.id)}&gt;Delete&lt;/button&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default TodoApp;</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900/50 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold gradient-text mb-4">VetroGPT</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">
+                    Part of the Vetro Labs ecosystem - The AI Engine for Next-Generation Builders
+                </p>
+            </div>
+            <div class="flex justify-center space-x-8 mb-8">
+                <a href="https://vetrolabs.vercel.app/" target="_blank" class="text-gray-400 hover:text-blue-400 transition-colors">
+                    <i class="fab fa-twitter text-xl"></i>
+                </a>
+                <a href="https://vetrolabs.vercel.app/" target="_blank" class="text-gray-400 hover:text-blue-400 transition-colors">
+                    <i class="fab fa-github text-xl"></i>
+                </a>
+                <a href="https://vetrolabs.vercel.app/" target="_blank" class="text-gray-400 hover:text-blue-400 transition-colors">
+                    <i class="fas fa-globe text-xl"></i>
+                </a>
+            </div>
+            <p class="text-gray-500">
+                © 2025 Vetro Labs. All rights reserved. | 
+                <a href="https://vetrolabs.vercel.app/" target="_blank" class="text-blue-400 hover:text-blue-300">Visit VetroLabs</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
