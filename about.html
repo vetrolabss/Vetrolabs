@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Vetro Labs - Pioneering AI-Powered Development</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 50%, #00D4FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .glow-effect:hover {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+        
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: #00D4FF;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1.5rem;
+            width: 2px;
+            height: calc(100% - 1rem);
+            background: linear-gradient(to bottom, #00D4FF, transparent);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-cyan-500/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold gradient-text">Vetro Labs</a>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="hover:text-cyan-400 transition-colors">Home</a>
+                    <a href="about.html" class="text-cyan-400">About</a>
+                    <a href="services.html" class="hover:text-cyan-400 transition-colors">Services</a>
+                    <a href="contact.html" class="hover:text-cyan-400 transition-colors">Contact</a>
+                </div>
+                <button class="glow-effect bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded-lg font-semibold">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h1 class="text-5xl lg:text-7xl font-black mb-6">
+                    <span class="gradient-text">Pioneering the Future</span><br>
+                    <span class="text-white">of AI Development</span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    At Vetro Labs, we're not just building tools—we're revolutionizing how developers 
+                    think, create, and deploy next-generation applications.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="scroll-reveal">
+                    <h2 class="text-4xl font-bold gradient-text mb-6">Our Mission</h2>
+                    <p class="text-gray-300 text-lg mb-6">
+                        To democratize AI-powered development by creating intuitive tools that amplify 
+                        human creativity and accelerate innovation. We believe that everyone should have 
+                        access to cutting-edge AI technology, regardless of their technical background.
+                    </p>
+                    <p class="text-gray-300 text-lg">
+                        Our platform bridges the gap between ideas and implementation, enabling builders 
+                        to focus on what matters most: creating exceptional experiences that shape the future.
+                    </p>
+                </div>
+                
+                <div class="scroll-reveal">
+                    <h2 class="text-4xl font-bold gradient-text mb-6">Our Vision</h2>
+                    <p class="text-gray-300 text-lg mb-6">
+                        A world where AI and human creativity work in perfect harmony to solve complex 
+                        challenges and create unprecedented opportunities. We envision a future where 
+                        development is limited only by imagination, not technical constraints.
+                    </p>
+                    <p class="text-gray-300 text-lg">
+                        Through continuous innovation and ethical AI practices, we're building the 
+                        foundation for the next generation of digital experiences.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Company Timeline -->
+    <section class="py-20 bg-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">Our Journey</h2>
+                <p class="text-xl text-gray-300">From concept to industry leader</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="space-y-12">
+                    <div class="timeline-item scroll-reveal">
+                        <div class="bg-gray-800/50 p-8 rounded-2xl">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-2xl font-bold gradient-text">Foundation</h3>
+                                <span class="text-cyan-400 font-semibold">2023</span>
+                            </div>
+                            <p class="text-gray-300">
+                                Vetro Labs was founded by a team of AI researchers and software engineers 
+                                who recognized the need for more intuitive development tools. Our mission 
+                                began with a simple question: "What if AI could understand your ideas and 
+                                turn them into code?"
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item scroll-reveal">
+                        <div class="bg-gray-800/50 p-8 rounded-2xl">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-2xl font-bold gradient-text">First Prototype</h3>
+                                <span class="text-cyan-400 font-semibold">2024</span>
+                            </div>
+                            <p class="text-gray-300">
+                                We developed our first AI-powered code generation engine, demonstrating 
+                                the potential of natural language programming. Early tests showed a 
+                                300% improvement in development speed for common tasks.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item scroll-reveal">
+                        <div class="bg-gray-800/50 p-8 rounded-2xl">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-2xl font-bold gradient-text">Platform Launch</h3>
+                                <span class="text-cyan-400 font-semibold">2024</span>
+                            </div>
+                            <p class="text-gray-300">
+                                VetroGPT and Code Forge launched to beta users, receiving overwhelming 
+                                positive feedback. Our platform processed over 100,000 code generations 
+                                in the first month alone.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item scroll-reveal">
+                        <div class="bg-gray-800/50 p-8 rounded-2xl">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-2xl font-bold gradient-text">Global Expansion</h3>
+                                <span class="text-cyan-400 font-semibold">2025</span>
+                            </div>
+                            <p class="text-gray-300">
+                                Today, Vetro Labs serves developers in over 50 countries, with our AI 
+                                engine generating millions of lines of production-ready code. We've 
+                                become the trusted partner for innovation-driven organizations worldwide.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">Meet Our Team</h2>
+                <p class="text-xl text-gray-300">The brilliant minds behind Vetro Labs</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <span class="text-2xl font-bold text-white">AS</span>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-2">Alex Sterling</h3>
+                    <p class="text-cyan-400 mb-4">CEO & Co-Founder</p>
+                    <p class="text-gray-300 text-sm">
+                        Former Google AI researcher with 10+ years in machine learning 
+                        and natural language processing.
+                    </p>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <span class="text-2xl font-bold text-white">MC</span>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-2">Maya Chen</h3>
+                    <p class="text-cyan-400 mb-4">CTO & Co-Founder</p>
+                    <p class="text-gray-300 text-sm">
+                        Ex-Microsoft principal engineer specializing in distributed systems 
+                        and cloud architecture.
+                    </p>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <span class="text-2xl font-bold text-white">DR</span>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-2">David Rodriguez</h3>
+                    <p class="text-cyan-400 mb-4">Head of AI Research</p>
+                    <p class="text-gray-300 text-sm">
+                        PhD in Computer Science from MIT, published researcher in 
+                        neural code generation and program synthesis.
+                    </p>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <span class="text-2xl font-bold text-white">SK</span>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-2">Sarah Kim</h3>
+                    <p class="text-cyan-400 mb-4">VP of Engineering</p>
+                    <p class="text-gray-300 text-sm">
+                        Former Amazon Web Services engineering lead with expertise in 
+                        scalable infrastructure and DevOps automation.
+                    </p>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <span class="text-2xl font-bold text-white">JP</span>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-2">James Patel</h3>
+                    <p class="text-cyan-400 mb-4">Head of Product</p>
+                    <p class="text-gray-300 text-sm">
+                        Ex-Stripe product manager with a track record of building 
+                        developer-focused tools and platforms.
+                    </p>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <span class="text-2xl font-bold text-white">LT</span>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-2">Lisa Thompson</h3>
+                    <p class="text-cyan-400 mb-4">Head of Design</p>
+                    <p class="text-gray-300 text-sm">
+                        Former Apple design lead with expertise in creating intuitive 
+                        user experiences for complex technical tools.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="py-20 bg-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">Our Values</h2>
+                <p class="text-xl text-gray-300">The principles that guide everything we do</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-4">Innovation</h3>
+                    <p class="text-gray-300">
+                        We constantly push the boundaries of what's possible with AI, 
+                        seeking new ways to empower developers and creators.
+                    </p>
+                </div>
+                
+                <div class="text-center scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-4">Accessibility</h3>
+                    <p class="text-gray-300">
+                        Technology should be accessible to everyone. We design our tools 
+                        to be intuitive and inclusive for developers of all skill levels.
+                    </p>
+                </div>
+                
+                <div class="text-center scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-4">Excellence</h3>
+                    <p class="text-gray-300">
+                        We hold ourselves to the highest standards in everything we do, 
+                        from code quality to user experience and customer support.
+                    </p>
+                </div>
+                
+                <div class="text-center scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-xl font-bold gradient-text mb-4">Community</h3>
+                    <p class="text-gray-300">
+                        We believe in the power of community-driven development. 
+                        Our success is measured by the success of our users.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold gradient-text mb-4">Vetro Labs</h3>
+                <p class="text-gray-400">The AI Engine for Next-Generation Builders</p>
+            </div>
+            <div class="text-gray-500">
+                © 2025 Vetro Labs. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.scroll-reveal').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
