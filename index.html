@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="https://6374ex7m3rfzi.ok.kimi.link">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vetro Labs - The AI Engine for Next-Generation Builders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #0B1426 0%, #1a2332 50%, #0B1426 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('./resources/hero-bg.jpg') center/cover;
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 50%, #00D4FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .glow-effect:hover {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+        
+        .particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .neural-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .typing-cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+        
+        .metric-card {
+            background: rgba(11, 20, 38, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .tool-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-cyan-500/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-text">Vetro Labs</h1>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="hover:text-cyan-400 transition-colors">Home</a>
+                    <a href="about.html" class="hover:text-cyan-400 transition-colors">About</a>
+                    <a href="services.html" class="hover:text-cyan-400 transition-colors">Services</a>
+                    <a href="contact.html" class="hover:text-cyan-400 transition-colors">Contact</a>
+                    <a href="https://twitter.com/vetrolabs" target="_blank" class="hover:text-cyan-400 transition-colors">Twitter</a>
+                </div>
+                <button class="glow-effect bg-cyan-500 hover:bg-cyan-600 px-6 py-2 rounded-lg font-semibold">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg min-h-screen flex items-center relative">
+        <div class="particle-container" id="particles"></div>
+        <div class="neural-canvas" id="neural-canvas"></div>
+        
+        <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <h1 class="text-5xl lg:text-7xl font-black leading-tight">
+                        <span class="gradient-text">The AI Engine</span><br>
+                        <span class="text-white">for Next-Generation</span><br>
+                        <span class="gradient-text" id="typed-text"></span>
+                    </h1>
+                    <p class="text-xl text-gray-300 leading-relaxed">
+                        Vetro Labs uses AI-powered code scaffolding, blockchain-ready tools, and simple onboarding 
+                        to help builders and traders turn ideas into working products faster than ever before.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="glow-effect bg-cyan-500 hover:bg-cyan-600 px-8 py-4 rounded-lg font-bold text-lg">
+                            Launch AI Forge
+                        </button>
+                        <button class="glow-effect border border-cyan-500 hover:bg-cyan-500/10 px-8 py-4 rounded-lg font-bold text-lg">
+                            Try VetroGPT
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <div class="aspect-square rounded-2xl overflow-hidden glow-effect">
+                        <img src="./resources/ai-visual.jpg" alt="AI Neural Network" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Metrics -->
+    <section class="py-20 bg-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">Powered by Excellence</h2>
+                <p class="text-xl text-gray-300">Real-time performance metrics from our AI engine</p>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="metric-card p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="text-4xl font-black gradient-text mb-2" id="metric-1">0</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wide">% Faster Setup</div>
+                </div>
+                <div class="metric-card p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="text-4xl font-black gradient-text mb-2" id="metric-2">0</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wide">X Development Speed</div>
+                </div>
+                <div class="metric-card p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="text-4xl font-black gradient-text mb-2" id="metric-3">0</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wide">% Productivity Gain</div>
+                </div>
+                <div class="metric-card p-8 rounded-2xl text-center scroll-reveal">
+                    <div class="text-4xl font-black gradient-text mb-2" id="metric-4">0</div>
+                    <div class="text-sm text-gray-400 uppercase tracking-wide">Active Builders</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Tools Showcase -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">AI Tools for Builders</h2>
+                <p class="text-xl text-gray-300">Transform your ideas into reality with our suite of AI-powered tools</p>
+            </div>
+            
+            <div class="tool-grid">
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 gradient-text">VetroGPT</h3>
+                    <p class="text-gray-300 mb-6">
+                        Your AI copilot that turns natural language into executable code. 
+                        Describe what you need and watch it build, test, and deploy automatically.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-cyan-400">Live Preview Available</span>
+                        <button class="text-cyan-400 hover:text-cyan-300">→</button>
+                    </div>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 gradient-text">Code Forge</h3>
+                    <p class="text-gray-300 mb-6">
+                        Advanced code scaffolding with AI-powered optimization. 
+                        Generate production-ready applications with best practices built-in.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-cyan-400">Try Demo</span>
+                        <button class="text-cyan-400 hover:text-cyan-300">→</button>
+                    </div>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 gradient-text">Smart Deploy</h3>
+                    <p class="text-gray-300 mb-6">
+                        Intelligent deployment pipeline with automated testing, 
+                        optimization, and monitoring for peak performance.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-cyan-400">Learn More</span>
+                        <button class="text-cyan-400 hover:text-cyan-300">→</button>
+                    </div>
+                </div>
+                
+                <div class="card-hover bg-gray-800/50 p-8 rounded-2xl scroll-reveal">
+                    <div class="w-16 h-16 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-cyan-500 rounded-lg"></div>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 gradient-text">Analytics AI</h3>
+                    <p class="text-gray-300 mb-6">
+                        Real-time performance monitoring with predictive insights 
+                        and automated optimization recommendations.
+                    </p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-cyan-400">View Dashboard</span>
+                        <button class="text-cyan-400 hover:text-cyan-300">→</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo Section -->
+    <section class="py-20 bg-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl font-bold gradient-text mb-4">See It In Action</h2>
+                <p class="text-xl text-gray-300">Experience the power of AI-driven development</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="scroll-reveal">
+                    <h3 class="text-3xl font-bold mb-6">Live Code Generation</h3>
+                    <p class="text-gray-300 mb-8">
+                        Watch as VetroGPT transforms your ideas into production-ready code in real-time. 
+                        Our AI understands context, follows best practices, and delivers optimized solutions.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-3 h-3 bg-cyan-500 rounded-full"></div>
+                            <span class="text-gray-300">Natural language to code conversion</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-3 h-3 bg-cyan-500 rounded-full"></div>
+                            <span class="text-gray-300">Automatic testing and validation</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-3 h-3 bg-cyan-500 rounded-full"></div>
+                            <span class="text-gray-300">Performance optimization</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-3 h-3 bg-cyan-500 rounded-full"></div>
+                            <span class="text-gray-300">Multi-language support</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scroll-reveal">
+                    <div class="bg-gray-900 rounded-2xl p-6 glow-effect">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                            <span class="text-sm text-gray-400">Live Preview</span>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-4 font-mono text-sm">
+                            <div class="text-cyan-400">// Generate a React component for a todo app</div>
+                            <div class="text-gray-300 mt-2" id="code-demo">
+                                <span class="typing-text"></span><span class="typing-cursor">|</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold gradient-text mb-4">Vetro Labs</h3>
+                <p class="text-gray-400 mb-6">The AI Engine for Next-Generation Builders</p>
+                <div class="flex justify-center space-x-6">
+                    <a href="https://twitter.com/vetrolabs" target="_blank" class="text-gray-400 hover:text-cyan-400 transition-colors">
+                        Twitter
+                    </a>
+                    <a href="about.html" class="text-gray-400 hover:text-cyan-400 transition-colors">
+                        About
+                    </a>
+                    <a href="services.html" class="text-gray-400 hover:text-cyan-400 transition-colors">
+                        Services
+                    </a>
+                    <a href="contact.html" class="text-gray-400 hover:text-cyan-400 transition-colors">
+                        Contact
+                    </a>
+                </div>
+            </div>
+            <div class="text-gray-500">
+                © 2025 Vetro Labs. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
