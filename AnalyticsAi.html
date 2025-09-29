@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics AI - Vetro Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/3.0.3/plotly.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.2);
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .chart-container.large {
+            height: 400px;
+        }
+        
+        .insight-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1));
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .trend-up {
+            color: #10b981;
+        }
+        
+        .trend-down {
+            color: #ef4444;
+        }
+        
+        .trend-neutral {
+            color: #6b7280;
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(139, 92, 246, 0.6);
+            border-radius: 50%;
+            animation: float 15s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-200px) rotate(180deg); opacity: 1; }
+        }
+        
+        .filter-button {
+            transition: all 0.3s ease;
+        }
+        
+        .filter-button.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+        
+        .filter-button:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .data-point {
+            transition: all 0.3s ease;
+        }
+        
+        .data-point:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- Navigation -->
+    <nav class="glass fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-sm"></i>
+                </div>
+                <span class="text-white font-bold text-xl">Vetro Labs</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="luach-ai-forge.html" class="text-gray-300 hover:text-white transition-colors">Luach AI Forge</a>
+                <a href="try-vetrogpt.html" class="text-gray-300 hover:text-white transition-colors">Try VetroGPT</a>
+                <a href="code-forge.html" class="text-gray-300 hover:text-white transition-colors">Code Forge</a>
+                <a href="smart-deploy.html" class="text-gray-300 hover:text-white transition-colors">Smart Deploy</a>
+                <a href="analytics-ai.html" class="text-blue-400 font-medium">Analytics AI</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-white mb-4">
+                    <span class="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                        Analytics AI
+                    </span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Advanced analytics and insights powered by AI. Monitor performance, predict trends, and make data-driven decisions with intelligent dashboards.
+                </p>
+            </div>
+
+            <!-- Time Filter -->
+            <div class="flex items-center justify-center mb-8">
+                <div class="glass rounded-2xl p-2 flex space-x-2">
+                    <button class="filter-button px-4 py-2 rounded-lg text-white" data-period="24h">24 Hours</button>
+                    <button class="filter-button px-4 py-2 rounded-lg text-white active" data-period="7d">7 Days</button>
+                    <button class="filter-button px-4 py-2 rounded-lg text-white" data-period="30d">30 Days</button>
+                    <button class="filter-button px-4 py-2 rounded-lg text-white" data-period="90d">90 Days</button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid mb-8">
+                <div class="metric-card p-6 rounded-2xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-blue-500 bg-opacity-20 rounded-lg">
+                            <i class="fas fa-users text-blue-400 text-xl"></i>
+                        </div>
+                        <span class="trend-up text-sm font-medium">+12.5%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-1">24,847</div>
+                    <div class="text-gray-400 text-sm">Active Users</div>
+                </div>
+
+                <div class="metric-card p-6 rounded-2xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-green-500 bg-opacity-20 rounded-lg">
+                            <i class="fas fa-chart-line text-green-400 text-xl"></i>
+                        </div>
+                        <span class="trend-up text-sm font-medium">+8.3%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-1">$127,543</div>
+                    <div class="text-gray-400 text-sm">Revenue</div>
+                </div>
+
+                <div class="metric-card p-6 rounded-2xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-purple-500 bg-opacity-20 rounded-lg">
+                            <i class="fas fa-rocket text-purple-400 text-xl"></i>
+                        </div>
+                        <span class="trend-down text-sm font-medium">-2.1%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-1">1,892</div>
+                    <div class="text-gray-400 text-sm">Deployments</div>
+                </div>
+
+                <div class="metric-card p-6 rounded-2xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-orange-500 bg-opacity-20 rounded-lg">
+                            <i class="fas fa-clock text-orange-400 text-xl"></i>
+                        </div>
+                        <span class="trend-up text-sm font-medium">+5.7%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-1">2m 34s</div>
+                    <div class="text-gray-400 text-sm">Avg Response Time</div>
+                </div>
+
+                <div class="metric-card p-6 rounded-2xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-red-500 bg-opacity-20 rounded-lg">
+                            <i class="fas fa-exclamation-triangle text-red-400 text-xl"></i>
+                        </div>
+                        <span class="trend-down text-sm font-medium">-15.2%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-1">0.23%</div>
+                    <div class="text-gray-400 text-sm">Error Rate</div>
+                </div>
+
+                <div class="metric-card p-6 rounded-2xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-cyan-500 bg-opacity-20 rounded-lg">
+                            <i class="fas fa-server text-cyan-400 text-xl"></i>
+                        </div>
+                        <span class="trend-neutral text-sm font-medium">99.8%</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-1">99.97%</div>
+                    <div class="text-gray-400 text-sm">Uptime</div>
+                </div>
+            </div>
+
+            <!-- Main Charts Grid -->
+            <div class="chart-grid mb-8">
+                <!-- User Activity Chart -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-chart-area text-blue-400 mr-2"></i>
+                        User Activity Trends
+                    </h3>
+                    <div id="userActivityChart" class="chart-container"></div>
+                </div>
+
+                <!-- Revenue Analytics -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-dollar-sign text-green-400 mr-2"></i>
+                        Revenue Analytics
+                    </h3>
+                    <div id="revenueChart" class="chart-container"></div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-tachometer-alt text-purple-400 mr-2"></i>
+                        Performance Metrics
+                    </h3>
+                    <div id="performanceChart" class="chart-container"></div>
+                </div>
+
+                <!-- Geographic Distribution -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-globe text-orange-400 mr-2"></i>
+                        Geographic Distribution
+                    </h3>
+                    <div id="geoChart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- AI Insights and Alerts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- AI Insights -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-brain text-purple-400 mr-2"></i>
+                        AI Insights
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="insight-card p-4 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-green-500 bg-opacity-20 rounded-lg">
+                                    <i class="fas fa-trending-up text-green-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium mb-1">Traffic Surge Detected</h4>
+                                    <p class="text-gray-300 text-sm">User activity increased by 45% in the last 2 hours. Consider scaling up resources.</p>
+                                    <div class="text-green-400 text-xs mt-2">Confidence: 92%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card p-4 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-blue-500 bg-opacity-20 rounded-lg">
+                                    <i class="fas fa-users text-blue-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium mb-1">User Engagement Peak</h4>
+                                    <p class="text-gray-300 text-sm">Peak usage detected at 2 PM EST. Optimal time for feature releases.</p>
+                                    <div class="text-blue-400 text-xs mt-2">Confidence: 87%</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card p-4 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-purple-500 bg-opacity-20 rounded-lg">
+                                    <i class="fas fa-chart-pie text-purple-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium mb-1">Revenue Opportunity</h4>
+                                    <p class="text-gray-300 text-sm">European market showing 23% growth potential. Consider localized pricing.</p>
+                                    <div class="text-purple-400 text-xs mt-2">Confidence: 79%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alerts & Notifications -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-bell text-yellow-400 mr-2"></i>
+                        Alerts & Notifications
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="alert-card p-4 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-yellow-500 bg-opacity-20 rounded-lg">
+                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium mb-1">High Memory Usage</h4>
+                                    <p class="text-gray-300 text-sm">Server memory usage at 85%. Consider optimizing or scaling.</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="text-yellow-400 text-xs">2 minutes ago</span>
+                                        <button class="text-blue-400 text-xs hover:text-blue-300">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-card p-4 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-red-500 bg-opacity-20 rounded-lg">
+                                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium mb-1">API Rate Limit Warning</h4>
+                                    <p class="text-gray-300 text-sm">Approaching rate limit for external API calls (89% used).</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="text-red-400 text-xs">5 minutes ago</span>
+                                        <button class="text-blue-400 text-xs hover:text-blue-300">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-card p-4 rounded-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="p-2 bg-blue-500 bg-opacity-20 rounded-lg">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium mb-1">Scheduled Maintenance</h4>
+                                    <p class="text-gray-300 text-sm">Database maintenance scheduled for tonight 2-4 AM EST.</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="text-blue-400 text-xs">1 hour ago</span>
+                                        <button class="text-blue-400 text-xs hover:text-blue-300">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analytics -->
+            <div class="glass rounded-2xl p-6 mb-8">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <i class="fas fa-microscope text-cyan-400 mr-3"></i>
+                    Advanced Analytics Dashboard
+                </h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- User Behavior Heatmap -->
+                    <div class="lg:col-span-2">
+                        <h4 class="text-lg font-semibold text-white mb-4">User Activity Heatmap</h4>
+                        <div id="heatmapChart" class="chart-container large"></div>
+                    </div>
+                    
+                    <!-- Real-time Metrics -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-4">Real-time Metrics</h4>
+                        <div class="space-y-4">
+                            <div class="data-point p-4 rounded-lg glass">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-300">Active Sessions</span>
+                                    <span class="text-green-400 text-sm">+23</span>
+                                </div>
+                                <div class="text-2xl font-bold text-white">1,247</div>
+                                <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                                    <div class="bg-green-400 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="data-point p-4 rounded-lg glass">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-300">API Calls/min</span>
+                                    <span class="text-blue-400 text-sm">+156</span>
+                                </div>
+                                <div class="text-2xl font-bold text-white">3,892</div>
+                                <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                                    <div class="bg-blue-400 h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="data-point p-4 rounded-lg glass">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-300">Database Queries</span>
+                                    <span class="text-purple-400 text-sm">+89</span>
+                                </div>
+                                <div class="text-2xl font-bold text-white">1,567</div>
+                                <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                                    <div class="bg-purple-400 h-2 rounded-full" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="data-point p-4 rounded-lg glass">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-gray-300">Queue Length</span>
+                                    <span class="text-orange-400 text-sm">-12</span>
+                                </div>
+                                <div class="text-2xl font-bold text-white">234</div>
+                                <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                                    <div class="bg-orange-400 h-2 rounded-full" style="width: 30%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Time filter functionality
+        document.querySelectorAll('.filter-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.filter-button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const period = this.dataset.period;
+                updateChartsForPeriod(period);
+            });
+        });
+
+        function updateChartsForPeriod(period) {
+            // Update all charts based on selected time period
+            initUserActivityChart(period);
+            initRevenueChart(period);
+            initPerformanceChart(period);
+            initGeoChart(period);
+            initHeatmapChart(period);
+            
+            showNotification(\`Analytics updated for \${period}\`, 'info');
+        }
+
+        // Initialize charts
+        function initUserActivityChart(period = '7d') {
+            const data = [{
+                x: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                y: [1200, 1900, 3000, 5000, 2000, 3000, 4200],
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Active Users',
+                line: { color: '#3b82f6', width: 3 },
+                marker: { color: '#8b5cf6', size: 8 },
+                fill: 'tonexty',
+                fillcolor: 'rgba(59, 130, 246, 0.1)'
+            }];
+
+            const layout = {
+                title: { text: 'Daily Active Users', font: { color: 'white', size: 16 } },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'white' },
+                xaxis: { color: 'white', gridcolor: 'rgba(255,255,255,0.1)' },
+                yaxis: { color: 'white', gridcolor: 'rgba(255,255,255,0.1)' },
+                margin: { t: 40, r: 20, b: 40, l: 60 },
+                showlegend: false
+            };
+
+            Plotly.newPlot('userActivityChart', data, layout, { displayModeBar: false, responsive: true });
+        }
+
+        function initRevenueChart(period = '7d') {
+            const data = [{
+                x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                y: [85000, 92000, 88000, 95000, 102000, 98000, 127000],
+                type: 'bar',
+                name: 'Revenue',
+                marker: {
+                    color: ['#10b981', '#10b981', '#10b981', '#10b981', '#10b981', '#10b981', '#3b82f6'],
+                    line: { color: '#10b981', width: 1 }
+                }
+            }];
+
+            const layout = {
+                title: { text: 'Monthly Revenue', font: { color: 'white', size: 16 } },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'white' },
+                xaxis: { color: 'white', gridcolor: 'rgba(255,255,255,0.1)' },
+                yaxis: { color: 'white', gridcolor: 'rgba(255,255,255,0.1)' },
+                margin: { t: 40, r: 20, b: 40, l: 60 },
+                showlegend: false
+            };
+
+            Plotly.newPlot('revenueChart', data, layout, { displayModeBar: false, responsive: true });
+        }
+
+        function initPerformanceChart(period = '7d') {
+            const data = [
+                {
+                    x: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    y: [150, 180, 220, 350, 280, 200],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Response Time (ms)',
+                    line: { color: '#8b5cf6', width: 2 },
+                    yaxis: 'y'
+                },
+                {
+                    x: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    y: [99.8, 99.9, 99.7, 99.5, 99.8, 99.9],
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Uptime (%)',
+                    line: { color: '#10b981', width: 2 },
+                    yaxis: 'y2'
+                }
+            ];
+
+            const layout = {
+                title: { text: 'Performance Metrics', font: { color: 'white', size: 16 } },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'white' },
+                xaxis: { color: 'white', gridcolor: 'rgba(255,255,255,0.1)' },
+                yaxis: { 
+                    title: 'Response Time (ms)', 
+                    color: 'white', 
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    side: 'left'
+                },
+                yaxis2: {
+                    title: 'Uptime (%)',
+                    overlaying: 'y',
+                    side: 'right',
+                    color: 'white'
+                },
+                margin: { t: 40, r: 60, b: 40, l: 60 },
+                legend: { font: { color: 'white' } }
+            };
+
+            Plotly.newPlot('performanceChart', data, layout, { displayModeBar: false, responsive: true });
+        }
+
+        function initGeoChart(period = '7d') {
+            const data = [{
+                type: 'pie',
+                labels: ['North America', 'Europe', 'Asia', 'South America', 'Africa', 'Oceania'],
+                values: [35, 28, 22, 8, 4, 3],
+                marker: {
+                    colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4']
+                },
+                textinfo: 'label+percent',
+                textfont: { color: 'white' },
+                hole: 0.4
+            }];
+
+            const layout = {
+                title: { text: 'User Distribution', font: { color: 'white', size: 16 } },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'white' },
+                margin: { t: 40, r: 20, b: 20, l: 20 },
+                showlegend: false
+            };
+
+            Plotly.newPlot('geoChart', data, layout, { displayModeBar: false, responsive: true });
+        }
+
+        function initHeatmapChart(period = '7d') {
+            const z = [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1],
+                [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2],
+                [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3],
+                [5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4],
+                [6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5],
+                [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6]
+            ];
+
+            const data = [{
+                z: z,
+                type: 'heatmap',
+                colorscale: [
+                    [0, '#1e293b'],
+                    [0.2, '#3b82f6'],
+                    [0.4, '#8b5cf6'],
+                    [0.6, '#10b981'],
+                    [0.8, '#f59e0b'],
+                    [1, '#ef4444']
+                ],
+                showscale: false
+            }];
+
+            const layout = {
+                title: { text: 'User Activity by Hour and Day', font: { color: 'white', size: 16 } },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'white' },
+                xaxis: { 
+                    title: 'Hour of Day',
+                    color: 'white', 
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    tickvals: [0, 6, 12, 18, 23],
+                    ticktext: ['00:00', '06:00', '12:00', '18:00', '23:00']
+                },
+                yaxis: { 
+                    title: 'Day of Week',
+                    color: 'white', 
+                    gridcolor: 'rgba(255,255,255,0.1)',
+                    tickvals: [0, 1, 2, 3, 4, 5, 6],
+                    ticktext: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                },
+                margin: { t: 40, r: 20, b: 60, l: 80 }
+            };
+
+            Plotly.newPlot('heatmapChart', data, layout, { displayModeBar: false, responsive: true });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = \`fixed top-24 right-6 p-4 rounded-lg text-white z-50 \${
+                type === 'success' ? 'bg-green-600' : 
+                type === 'error' ? 'bg-red-600' : 
+                'bg-blue-600'
+            }\`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            anime({
+                targets: notification,
+                opacity: [0, 1],
+                translateX: [100, 0],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+            
+            setTimeout(() => {
+                anime({
+                    targets: notification,
+                    opacity: [1, 0],
+                    translateX: [0, 100],
+                    duration: 300,
+                    easing: 'easeInQuad',
+                    complete: () => notification.remove()
+                });
+            }, 3000);
+        }
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 8 + 12) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Real-time data updates
+        function updateRealTimeMetrics() {
+            const metrics = document.querySelectorAll('.data-point');
+            
+            metrics.forEach(metric => {
+                const valueElement = metric.querySelector('.text-2xl');
+                const changeElement = metric.querySelector('.text-sm');
+                
+                // Simulate real-time updates
+                const currentValue = parseInt(valueElement.textContent.replace(/,/g, ''));
+                const change = Math.floor(Math.random() * 20) - 10;
+                const newValue = currentValue + change;
+                
+                if (change > 0) {
+                    changeElement.textContent = \`+\${change}\`;
+                    changeElement.className = 'text-green-400 text-sm';
+                } else if (change < 0) {
+                    changeElement.textContent = change.toString();
+                    changeElement.className = 'text-red-400 text-sm';
+                }
+                
+                valueElement.textContent = newValue.toLocaleString();
+                
+                // Update progress bar
+                const progressBar = metric.querySelector('.h-2');
+                const newWidth = Math.max(10, Math.min(100, (newValue % 5000) / 50));
+                progressBar.style.width = newWidth + '%';
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all charts
+            initUserActivityChart();
+            initRevenueChart();
+            initPerformanceChart();
+            initGeoChart();
+            initHeatmapChart();
+            
+            createParticles();
+            
+            // Start real-time updates
+            setInterval(updateRealTimeMetrics, 5000);
+            
+            // Animate elements on load
+            anime({
+                targets: '.glass',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 1000,
+                delay: anime.stagger(200),
+                easing: 'easeOutQuad'
+            });
+
+            anime({
+                targets: '.metric-card',
+                opacity: [0, 1],
+                scale: [0.8, 1],
+                duration: 800,
+                delay: anime.stagger(100, {start: 600}),
+                easing: 'easeOutQuad'
+            });
+
+            anime({
+                targets: '.insight-card, .alert-card',
+                opacity: [0, 1],
+                translateX: [-30, 0],
+                duration: 800,
+                delay: anime.stagger(150, {start: 1000}),
+                easing: 'easeOutQuad'
+            });
+
+            anime({
+                targets: '.data-point',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 800,
+                delay: anime.stagger(100, {start: 1200}),
+                easing: 'easeOutQuad'
+            });
+        });
+    </script>
+<script>
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            e.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>
