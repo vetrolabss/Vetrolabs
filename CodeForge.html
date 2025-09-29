@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Forge - Vetro Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .editor-container {
+            height: calc(100vh - 200px);
+            position: relative;
+        }
+        
+        .file-tab {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .file-tab.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom-color: #3b82f6;
+        }
+        
+        .file-tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .terminal {
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .terminal-output {
+            color: #10b981;
+            padding: 8px 12px;
+        }
+        
+        .terminal-input {
+            color: #fbbf24;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terminal-prompt {
+            color: #3b82f6;
+            margin-right: 8px;
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(16, 185, 129, 0.6);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-150px) rotate(180deg); opacity: 1; }
+        }
+        
+        .code-suggestion {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .error-indicator {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+        }
+        
+        .warning-indicator {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid #f59e0b;
+        }
+        
+        .success-indicator {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- Navigation -->
+    <nav class="glass fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-sm"></i>
+                </div>
+                <span class="text-white font-bold text-xl">Vetro Labs</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="luach-ai-forge.html" class="text-gray-300 hover:text-white transition-colors">Luach AI Forge</a>
+                <a href="try-vetrogpt.html" class="text-gray-300 hover:text-white transition-colors">Try VetroGPT</a>
+                <a href="code-forge.html" class="text-blue-400 font-medium">Code Forge</a>
+                <a href="smart-deploy.html" class="text-gray-300 hover:text-white transition-colors">Smart Deploy</a>
+                <a href="analytics-ai.html" class="text-gray-300 hover:text-white transition-colors">Analytics AI</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-24 px-6 h-screen">
+        <div class="max-w-7xl mx-auto h-full">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+                <!-- Sidebar -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Project Explorer -->
+                    <div class="glass rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-white flex items-center">
+                                <i class="fas fa-folder text-blue-400 mr-2"></i>
+                                Explorer
+                            </h3>
+                            <button class="p-1 rounded hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-plus text-gray-400"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="sidebar-item p-2 rounded-lg cursor-pointer active" data-file="main.py">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fab fa-python text-yellow-400"></i>
+                                    <span class="text-white text-sm">main.py</span>
+                                </div>
+                            </div>
+                            <div class="sidebar-item p-2 rounded-lg cursor-pointer" data-file="utils.js">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fab fa-js-square text-yellow-400"></i>
+                                    <span class="text-white text-sm">utils.js</span>
+                                </div>
+                            </div>
+                            <div class="sidebar-item p-2 rounded-lg cursor-pointer" data-file="styles.css">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fab fa-css3-alt text-blue-400"></i>
+                                    <span class="text-white text-sm">styles.css</span>
+                                </div>
+                            </div>
+                            <div class="sidebar-item p-2 rounded-lg cursor-pointer" data-file="index.html">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fab fa-html5 text-orange-400"></i>
+                                    <span class="text-white text-sm">index.html</span>
+                                </div>
+                            </div>
+                            <div class="sidebar-item p-2 rounded-lg cursor-pointer" data-file="app.rs">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-cog text-orange-400"></i>
+                                    <span class="text-white text-sm">app.rs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Code Assistant -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                            <i class="fas fa-robot text-purple-400 mr-2"></i>
+                            AI Assistant
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <div class="code-suggestion p-3 rounded-lg">
+                                <div class="text-sm text-blue-300 font-medium">Code Completion</div>
+                                <div class="text-white text-sm mt-1">AI suggests: Add error handling to this function</div>
+                            </div>
+                            <div class="code-suggestion p-3 rounded-lg">
+                                <div class="text-sm text-green-300 font-medium">Optimization</div>
+                                <div class="text-white text-sm mt-1">This loop can be vectorized for better performance</div>
+                            </div>
+                            <div class="code-suggestion p-3 rounded-lg">
+                                <div class="text-sm text-yellow-300 font-medium">Security</div>
+                                <div class="text-white text-sm mt-1">Consider input validation for user data</div>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full mt-4 p-3 bg-gradient-to-r from-purple-500 to-blue-600 text-white rounded-lg hover:from-purple-600 hover:to-blue-700 transition-all">
+                            <i class="fas fa-magic mr-2"></i>
+                            Generate Code
+                        </button>
+                    </div>
+
+                    <!-- Project Stats -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Project Stats</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Lines of Code</span>
+                                <span class="text-white font-medium">1,247</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Files</span>
+                                <span class="text-white font-medium">12</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Errors</span>
+                                <span class="text-red-400 font-medium">3</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Warnings</span>
+                                <span class="text-yellow-400 font-medium">7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Editor Area -->
+                <div class="lg:col-span-3 flex flex-col">
+                    <div class="glass rounded-2xl p-6 flex-1 flex flex-col">
+                        <!-- Editor Header -->
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex space-x-1">
+                                    <div class="file-tab active px-4 py-2 rounded-t-lg cursor-pointer" data-file="main.py">
+                                        <div class="flex items-center space-x-2">
+                                            <i class="fab fa-python text-yellow-400 text-sm"></i>
+                                            <span class="text-white text-sm">main.py</span>
+                                            <button class="ml-2 text-gray-400 hover:text-white">
+                                                <i class="fas fa-times text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button class="p-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors" title="Run Code">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors" title="Debug">
+                                    <i class="fas fa-bug"></i>
+                                </button>
+                                <button class="p-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors" title="AI Review">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Editor -->
+                        <div id="editor" class="editor-container bg-gray-900 rounded-lg"></div>
+
+                        <!-- Terminal -->
+                        <div class="terminal mt-4 rounded-lg overflow-hidden">
+                            <div class="bg-gray-800 px-4 py-2 flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-terminal text-green-400"></i>
+                                    <span class="text-white text-sm font-medium">Terminal</span>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-white">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="terminal-output">
+                                <div>$ python main.py</div>
+                                <div class="text-green-400">✓ Code executed successfully</div>
+                                <div class="text-blue-400">Output: Hello, Vetro Labs!</div>
+                            </div>
+                            <div class="terminal-input">
+                                <span class="terminal-prompt">$</span>
+                                <input type="text" class="flex-1 bg-transparent text-white outline-none ml-2" placeholder="Enter command...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Monaco Editor setup
+        let editor;
+        let currentFile = 'main.py';
+        
+        const fileContents = {
+            'main.py': `# Vetro Labs - AI Code Forge
+import numpy as np
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+def create_neural_network(input_shape, output_shape):
+    """
+    Create a neural network for AI model training
+    """
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(128, activation='relu', input_shape=input_shape),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dense(output_shape, activation='softmax')
+    ])
+    
+    model.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    
+    return model
+
+def train_model(X_train, y_train, epochs=50):
+    """
+    Train the neural network model
+    """
+    model = create_neural_network(X_train.shape[1:], y_train.shape[1])
+    
+    history = model.fit(
+        X_train, y_train,
+        epochs=epochs,
+        validation_split=0.2,
+        verbose=1
+    )
+    
+    return model, history
+
+def visualize_training(history):
+    """
+    Visualize the training progress
+    """
+    plt.figure(figsize=(12, 4))
+    
+    # Plot training & validation accuracy
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('Model Accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Validation'])
+    
+    # Plot training & validation loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Model Loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Validation'])
+    
+    plt.tight_layout()
+    plt.show()
+
+if __name__ == "__main__":
+    print("🚀 Vetro Labs AI Code Forge")
+    print("Neural Network Training Module")
+    
+    # Example usage
+    # X_train, y_train = load_your_data()
+    # model, history = train_model(X_train, y_train)
+    # visualize_training(history)`,
+            
+            'utils.js': `// Vetro Labs - JavaScript Utilities
+class AIForgeUtils {
+    constructor() {
+        this.apiEndpoint = 'https://api.vetrolabs.com/v1';
+        this.models = new Map();
+    }
+
+    /**
+     * Initialize AI model with configuration
+     */
+    async initializeModel(config) {
+        try {
+            const response = await fetch(\`\${this.apiEndpoint}/models/initialize\`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': \`Bearer \${config.apiKey}\`
+                },
+                body: JSON.stringify(config)
+            });
+
+            const data = await response.json();
+            this.models.set(config.modelId, data);
+            return data;
+        } catch (error) {
+            console.error('Model initialization failed:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Process data through AI model
+     */
+    async processData(modelId, inputData) {
+        const model = this.models.get(modelId);
+        if (!model) {
+            throw new Error('Model not found');
+        }
+
+        // Simulate AI processing
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                    prediction: Math.random(),
+                    confidence: 0.95,
+                    processingTime: Date.now()
+                });
+            }, 1000);
+        });
+    }
+
+    /**
+     * Generate code using AI
+     */
+    async generateCode(prompt, language = 'javascript') {
+        const templates = {
+            javascript: this.generateJavaScriptTemplate(prompt),
+            python: this.generatePythonTemplate(prompt),
+            rust: this.generateRustTemplate(prompt)
+        };
+
+        return templates[language] || templates.javascript;
+    }
+
+    generateJavaScriptTemplate(prompt) {
+        return \`
+// Generated by Vetro Labs AI
+// Prompt: \${prompt}
+
+class GeneratedClass {
+    constructor() {
+        this.initialize();
+    }
+
+    initialize() {
+        console.log('AI-generated code initialized');
+    }
+
+    process(data) {
+        // AI processing logic here
+        return data.map(item => ({
+            ...item,
+            processed: true,
+            timestamp: Date.now()
+        }));
+    }
+}
+
+export default GeneratedClass;
+\`;
+    }
+}
+
+// Export for use
+export { AIForgeUtils };`,
+            
+            'styles.css': `/* Vetro Labs - AI Code Forge Styles */
+:root {
+    --primary-color: #3b82f6;
+    --secondary-color: #8b5cf6;
+    --accent-color: #10b981;
+    --background-dark: #0f0f23;
+    --background-light: #1a1a2e;
+    --text-primary: #ffffff;
+    --text-secondary: #9ca3af;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--background-dark) 0%, var(--background-light) 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+.header p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.feature-icon i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.cta-section {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .features {
+        grid-template-columns: 1fr;
+    }
+}`,
+            
+            'index.html': `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vetro Labs - AI Code Forge</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>AI Code Forge</h1>
+            <p>Revolutionary AI-powered development environment for next-generation builders</p>
+        </header>
+        
+        <main class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>Intelligent Code Generation</h3>
+                <p>Generate production-ready code with AI assistance. Support for multiple programming languages and frameworks.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h3>Real-time Debugging</h3>
+                <p>Advanced debugging tools with AI-powered error detection and automatic fix suggestions.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3>Smart Deployment</h3>
+                <p>One-click deployment to cloud platforms with automatic optimization and scaling.</p>
+            </div>
+        </main>
+        
+        <section class="cta-section">
+            <a href="#" class="cta-button">Start Building Now</a>
+        </section>
+    </div>
+</body>
+</html>`,
+            
+            'app.rs': `// Vetro Labs - Rust Application
+use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
+use tokio::sync::Mutex;
+use std::sync::Arc;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AIModel {
+    pub id: String,
+    pub name: String,
+    pub version: String,
+    pub parameters: HashMap<String, f64>,
+    pub is_active: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PredictionRequest {
+    pub model_id: String,
+    pub input_data: Vec<f64>,
+    pub threshold: Option<f64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PredictionResponse {
+    pub model_id: String,
+    pub prediction: f64,
+    pub confidence: f64,
+    pub processing_time_ms: u64,
+    pub timestamp: i64,
+}
+
+pub struct AIForgeService {
+    models: Arc<Mutex<HashMap<String, AIModel>>>,
+    metrics: Arc<Mutex<HashMap<String, u64>>>,
+}
+
+impl AIForgeService {
+    pub fn new() -> Self {
+        Self {
+            models: Arc::new(Mutex::new(HashMap::new())),
+            metrics: Arc::new(Mutex::new(HashMap::new())),
+        }
+    }
+
+    pub async fn register_model(&self, model: AIModel) -> Result<(), String> {
+        let mut models = self.models.lock().await;
+        
+        if models.contains_key(&model.id) {
+            return Err(format!("Model {} already exists", model.id));
+        }
+        
+        models.insert(model.id.clone(), model);
+        
+        // Update metrics
+        let mut metrics = self.metrics.lock().await;
+        *metrics.entry("models_registered".to_string()).or_insert(0) += 1;
+        
+        Ok(())
+    }
+
+    pub async fn predict(&self, request: PredictionRequest) -> Result<PredictionResponse, String> {
+        let models = self.models.lock().await;
+        
+        let model = models.get(&request.model_id)
+            .ok_or_else(|| format!("Model {} not found", request.model_id))?;
+        
+        if !model.is_active {
+            return Err(format!("Model {} is not active", model.id));
+        }
+
+        let start_time = std::time::Instant::now();
+        
+        // Simulate AI processing
+        let prediction = self.calculate_prediction(&request.input_data, model);
+        let confidence = self.calculate_confidence(&request.input_data, model);
+        
+        let processing_time = start_time.elapsed().as_millis() as u64;
+        
+        // Update metrics
+        let mut metrics = self.metrics.lock().await;
+        *metrics.entry("predictions_made".to_string()).or_insert(0) += 1;
+        *metrics.entry("total_processing_time".to_string()).or_insert(0) += processing_time;
+        
+        Ok(PredictionResponse {
+            model_id: model.id.clone(),
+            prediction,
+            confidence,
+            processing_time_ms: processing_time,
+            timestamp: chrono::Utc::now().timestamp(),
+        })
+    }
+
+    fn calculate_prediction(&self, input_data: &[f64], model: &AIModel) -> f64 {
+        // Simplified prediction logic
+        let weights = model.parameters.get("weight").copied().unwrap_or(1.0);
+        let bias = model.parameters.get("bias").copied().unwrap_or(0.0);
+        
+        input_data.iter().sum::<f64>() * weights + bias
+    }
+
+    fn calculate_confidence(&self, input_data: &[f64], model: &AIModel) -> f64 {
+        // Simplified confidence calculation
+        let base_confidence = model.parameters.get("confidence").copied().unwrap_or(0.95);
+        let data_quality = input_data.iter().map(|&x| x.abs()).sum::<f64>() / input_data.len() as f64;
+        
+        (base_confidence * data_quality).min(1.0)
+    }
+
+    pub async fn get_metrics(&self) -> HashMap<String, u64> {
+        let metrics = self.metrics.lock().await;
+        metrics.clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_model_registration() {
+        let service = AIForgeService::new();
+        
+        let model = AIModel {
+            id: "test_model".to_string(),
+            name: "Test Model".to_string(),
+            version: "1.0.0".to_string(),
+            parameters: HashMap::new(),
+            is_active: true,
+        };
+        
+        let result = service.register_model(model).await;
+        assert!(result.is_ok());
+        
+        let metrics = service.get_metrics().await;
+        assert_eq!(metrics.get("models_registered"), Some(&1));
+    }
+
+    #[tokio::test]
+    async fn test_prediction() {
+        let service = AIForgeService::new();
+        
+        let mut params = HashMap::new();
+        params.insert("weight".to_string(), 2.0);
+        params.insert("bias".to_string(), 1.0);
+        params.insert("confidence".to_string(), 0.9);
+        
+        let model = AIModel {
+            id: "test_model".to_string(),
+            name: "Test Model".to_string(),
+            version: "1.0.0".to_string(),
+            parameters: params,
+            is_active: true,
+        };
+        
+        service.register_model(model).await.unwrap();
+        
+        let request = PredictionRequest {
+            model_id: "test_model".to_string(),
+            input_data: vec![1.0, 2.0, 3.0],
+            threshold: None,
+        };
+        
+        let response = service.predict(request).await;
+        assert!(response.is_ok());
+        
+        let prediction = response.unwrap();
+        assert_eq!(prediction.model_id, "test_model");
+        assert!(prediction.confidence > 0.0);
+    }
+}`
+        };
+
+        // Initialize Monaco Editor
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+        
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: fileContents[currentFile],
+                language: 'python',
+                theme: 'vs-dark',
+                fontSize: 14,
+                fontFamily: 'Monaco, Menlo, Ubuntu Mono, monospace',
+                automaticLayout: true,
+                minimap: { enabled: true },
+                scrollBeyondLastLine: false,
+                wordWrap: 'on',
+                lineNumbers: 'on',
+                folding: true,
+                selectOnLineNumbers: true,
+                roundedSelection: false,
+                readOnly: false,
+                cursorStyle: 'line',
+                multiCursorModifier: 'ctrlCmd',
+                bracketMatching: 'always',
+                autoClosingBrackets: 'always',
+                autoClosingQuotes: 'always',
+                formatOnPaste: true,
+                formatOnType: true,
+                suggestOnTriggerCharacters: true,
+                acceptSuggestionOnEnter: 'on',
+                tabCompletion: 'on',
+                wordBasedSuggestions: true,
+                parameterHints: { enabled: true },
+                hover: { enabled: true },
+                links: { enabled: true },
+                colorDecorators: { enabled: true },
+                lightbulb: { enabled: true }
+            });
+
+            // Add custom keyboard shortcuts
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function() {
+                saveCurrentFile();
+            });
+
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, function() {
+                runCurrentFile();
+            });
+
+            // Listen for content changes
+            editor.onDidChangeModelContent(function() {
+                updateFileStats();
+            });
+        });
+
+        // File management
+        function switchFile(fileName) {
+            if (editor && fileContents[fileName]) {
+                // Save current file content
+                fileContents[currentFile] = editor.getValue();
+                
+                // Switch to new file
+                currentFile = fileName;
+                editor.setValue(fileContents[fileName]);
+                
+                // Update language
+                const language = getLanguageFromFileName(fileName);
+                monaco.editor.setModelLanguage(editor.getModel(), language);
+                
+                // Update UI
+                updateActiveTab(fileName);
+                updateActiveSidebarItem(fileName);
+            }
+        }
+
+        function getLanguageFromFileName(fileName) {
+            const extensions = {
+                'py': 'python',
+                'js': 'javascript',
+                'ts': 'typescript',
+                'html': 'html',
+                'css': 'css',
+                'rs': 'rust',
+                'java': 'java',
+                'cpp': 'cpp',
+                'c': 'c',
+                'json': 'json',
+                'xml': 'xml',
+                'yaml': 'yaml',
+                'yml': 'yaml'
+            };
+            
+            const ext = fileName.split('.').pop().toLowerCase();
+            return extensions[ext] || 'plaintext';
+        }
+
+        function saveCurrentFile() {
+            if (editor) {
+                fileContents[currentFile] = editor.getValue();
+                showNotification('File saved successfully!', 'success');
+            }
+        }
+
+        function runCurrentFile() {
+            // Simulate code execution
+            const terminalOutput = document.querySelector('.terminal-output');
+            const newOutput = document.createElement('div');
+            newOutput.innerHTML = `
+                <div>$ python ${currentFile}</div>
+                <div class="text-green-400">✓ Code executed successfully</div>
+                <div class="text-blue-400">Output: Running ${currentFile}...</div>
+            `;
+            terminalOutput.appendChild(newOutput);
+            
+            // Scroll to bottom
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            
+            showNotification('Code executed!', 'success');
+        }
+
+        function updateFileStats() {
+            if (editor) {
+                const content = editor.getValue();
+                const lines = content.split('\n').length;
+                
+                // Update stats in UI
+                // This would update the project stats panel
+            }
+        }
+
+        function updateActiveTab(fileName) {
+            document.querySelectorAll('.file-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            const activeTab = document.querySelector(\`.file-tab[data-file="\${fileName}"]\`);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+        }
+
+        function updateActiveSidebarItem(fileName) {
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeItem = document.querySelector(\`.sidebar-item[data-file="\${fileName}"]\`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = \`fixed top-24 right-6 p-4 rounded-lg text-white z-50 \${
+                type === 'success' ? 'bg-green-600' : 
+                type === 'error' ? 'bg-red-600' : 
+                'bg-blue-600'
+            }\`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            anime({
+                targets: notification,
+                opacity: [0, 1],
+                translateX: [100, 0],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                anime({
+                    targets: notification,
+                    opacity: [1, 0],
+                    translateX: [0, 100],
+                    duration: 300,
+                    easing: 'easeInQuad',
+                    complete: () => notification.remove()
+                });
+            }, 3000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // File tab switching
+            document.querySelectorAll('.file-tab, .sidebar-item').forEach(element => {
+                element.addEventListener('click', function() {
+                    const fileName = this.dataset.file;
+                    if (fileName) {
+                        switchFile(fileName);
+                    }
+                });
+            });
+
+            // Terminal input
+            const terminalInput = document.querySelector('.terminal-input input');
+            terminalInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const command = this.value;
+                    this.value = '';
+                    
+                    const terminalOutput = document.querySelector('.terminal-output');
+                    const output = document.createElement('div');
+                    output.innerHTML = \`
+                        <div class="text-green-400">Executing: \${command}</div>
+                        <div class="text-blue-400">Command processed successfully</div>
+                    \`;
+                    terminalOutput.appendChild(output);
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                }
+            });
+
+            // Create floating particles
+            createParticles();
+            
+            // Animate elements on load
+            anime({
+                targets: '.glass',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 1000,
+                delay: anime.stagger(200),
+                easing: 'easeOutQuad'
+            });
+
+            anime({
+                targets: '.sidebar-item',
+                opacity: [0, 1],
+                translateX: [-30, 0],
+                duration: 800,
+                delay: anime.stagger(100, {start: 600}),
+                easing: 'easeOutQuad'
+            });
+        });
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            for (let i = 0; i < 25; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 5 + 8) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+    </script>
+<script>
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            e.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>
