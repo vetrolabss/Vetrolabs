@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - Vetro Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pricing-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .pricing-card.featured {
+            border: 2px solid #3b82f6;
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-8px);
+        }
+        
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .feature-item {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            transform: translateX(4px);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .payment-method {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .payment-method:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .payment-method.selected {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .solana-wallet {
+            background: linear-gradient(135deg, #9945ff, #14f195);
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(153, 69, 255, 0.6);
+            border-radius: 50%;
+            animation: float 18s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-250px) rotate(180deg); opacity: 1; }
+        }
+        
+        .crypto-price {
+            background: linear-gradient(135deg, rgba(153, 69, 255, 0.1), rgba(20, 241, 149, 0.1));
+            border: 1px solid rgba(153, 69, 255, 0.3);
+        }
+        
+        .payment-status {
+            transition: all 0.3s ease;
+        }
+        
+        .payment-status.processing {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .payment-status.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(34, 197, 94, 0.1));
+            border-left: 4px solid #10b981;
+        }
+        
+        .payment-status.failed {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(248, 113, 113, 0.1));
+            border-left: 4px solid #ef4444;
+        }
+        
+        .wallet-address {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- Navigation -->
+    <nav class="glass fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-sm"></i>
+                </div>
+                <span class="text-white font-bold text-xl">Vetro Labs</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="luach-ai-forge.html" class="text-gray-300 hover:text-white transition-colors">Luach AI Forge</a>
+                <a href="try-vetrogpt.html" class="text-gray-300 hover:text-white transition-colors">Try VetroGPT</a>
+                <a href="code-forge.html" class="text-gray-300 hover:text-white transition-colors">Code Forge</a>
+                <a href="smart-deploy.html" class="text-gray-300 hover:text-white transition-colors">Smart Deploy</a>
+                <a href="analytics-ai.html" class="text-gray-300 hover:text-white transition-colors">Analytics AI</a>
+                <a href="pricing.html" class="text-blue-400 font-medium">Pricing</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-white mb-4">
+                    <span class="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                        Choose Your Plan
+                    </span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Unlock the full potential of AI-powered development with flexible pricing plans designed for teams of all sizes.
+                </p>
+            </div>
+
+            <!-- Pricing Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <!-- Starter Plan -->
+                <div class="pricing-card glass rounded-2xl p-8">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">Starter</h3>
+                        <p class="text-gray-400 mb-6">Perfect for individual developers</p>
+                        <div class="mb-4">
+                            <span class="text-4xl font-bold text-white">$29</span>
+                            <span class="text-gray-400">/month</span>
+                        </div>
+                        <div class="crypto-price p-3 rounded-lg mb-4">
+                            <div class="text-sm text-gray-300">or pay with Solana</div>
+                            <div class="text-lg font-bold text-purple-400">0.15 SOL</div>
+                            <div class="text-xs text-gray-400">≈ $29 at current rate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">5 AI Forge projects</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Basic VetroGPT access</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">10GB storage</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Community support</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Basic analytics</span>
+                        </div>
+                    </div>
+                    
+                    <button class="choose-plan-btn w-full p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all font-semibold" data-plan="starter" data-price="0.15">
+                        Choose Starter
+                    </button>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="pricing-card glass rounded-2xl p-8 featured">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">Professional</h3>
+                        <p class="text-gray-400 mb-6">Ideal for growing teams</p>
+                        <div class="mb-4">
+                            <span class="text-4xl font-bold text-white">$99</span>
+                            <span class="text-gray-400">/month</span>
+                        </div>
+                        <div class="crypto-price p-3 rounded-lg mb-4">
+                            <div class="text-sm text-gray-300">or pay with Solana</div>
+                            <div class="text-lg font-bold text-purple-400">0.52 SOL</div>
+                            <div class="text-xs text-gray-400">≈ $99 at current rate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Unlimited AI Forge projects</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Full VetroGPT access</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">100GB storage</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Priority support</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Advanced analytics</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Team collaboration</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Smart Deploy included</span>
+                        </div>
+                    </div>
+                    
+                    <button class="choose-plan-btn w-full p-4 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-all font-semibold" data-plan="professional" data-price="0.52">
+                        Choose Professional
+                    </button>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card glass rounded-2xl p-8">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">Enterprise</h3>
+                        <p class="text-gray-400 mb-6">For large organizations</p>
+                        <div class="mb-4">
+                            <span class="text-4xl font-bold text-white">$299</span>
+                            <span class="text-gray-400">/month</span>
+                        </div>
+                        <div class="crypto-price p-3 rounded-lg mb-4">
+                            <div class="text-sm text-gray-300">or pay with Solana</div>
+                            <div class="text-lg font-bold text-purple-400">1.58 SOL</div>
+                            <div class="text-xs text-gray-400">≈ $299 at current rate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Everything in Professional</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Unlimited storage</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Custom AI models</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Dedicated support</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">SLA guarantee</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">On-premise deployment</span>
+                        </div>
+                        <div class="feature-item p-3 rounded-lg flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            <span class="text-white">Custom integrations</span>
+                        </div>
+                    </div>
+                    
+                    <button class="choose-plan-btn w-full p-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all font-semibold" data-plan="enterprise" data-price="1.58">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+
+            <!-- Payment Section -->
+            <div id="paymentSection" class="glass rounded-2xl p-8 mb-12 hidden">
+                <h3 class="text-2xl font-bold text-white mb-6 text-center">Complete Your Purchase</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Payment Methods -->
+                    <div>
+                        <h4 class="text-lg font-semibold text-white mb-4">Choose Payment Method</h4>
+                        <div class="space-y-4">
+                            <div class="payment-method glass p-4 rounded-lg selected" data-method="solana">
+                                <div class="flex items-center space-x-4">
+                                    <div class="solana-wallet w-12 h-12 rounded-lg flex items-center justify-center">
+                                        <i class="fab fa-ethereum text-white text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white font-medium">Solana (SOL)</div>
+                                        <div class="text-gray-400 text-sm">Fast & secure blockchain payments</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method glass p-4 rounded-lg" data-method="card">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-credit-card text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white font-medium">Credit Card</div>
+                                        <div class="text-gray-400 text-sm">Visa, Mastercard, American Express</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-method glass p-4 rounded-lg" data-method="paypal">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center">
+                                        <i class="fab fa-paypal text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-white font-medium">PayPal</div>
+                                        <div class="text-gray-400 text-sm">Pay with your PayPal account</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Solana Payment Details -->
+                        <div id="solanaPayment" class="mt-6">
+                            <h5 class="text-white font-medium mb-4">Send SOL to this address:</h5>
+                            <div class="bg-gray-800 p-4 rounded-lg mb-4">
+                                <div class="wallet-address text-purple-400" id="3khUUsRd8ihbpSL2ph3BhQfRhJMYtQYhRTzaqU9Uhkay">
+                                  }
+    });
+</script>
+</body>
+</html>  
