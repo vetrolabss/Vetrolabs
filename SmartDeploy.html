@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Deploy - Vetro Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/3.0.3/plotly.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .deployment-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .deployment-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.2);
+        }
+        
+        .deployment-card.success {
+            border-left-color: #10b981;
+        }
+        
+        .deployment-card.failed {
+            border-left-color: #ef4444;
+        }
+        
+        .deployment-card.deploying {
+            border-left-color: #f59e0b;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.success {
+            background: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        
+        .status-indicator.failed {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+        
+        .status-indicator.deploying {
+            background: #f59e0b;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 8px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 8px;
+            transition: width 0.3s ease;
+        }
+        
+        .platform-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .platform-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .platform-card.selected {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(16, 185, 129, 0.6);
+            border-radius: 50%;
+            animation: float 12s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-180px) rotate(180deg); opacity: 1; }
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .log-entry {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 4px 8px;
+            border-left: 3px solid transparent;
+        }
+        
+        .log-entry.info {
+            border-left-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .log-entry.success {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .log-entry.error {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        .log-entry.warning {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <!-- Navigation -->
+    <nav class="glass fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-brain text-white text-sm"></i>
+                </div>
+                <span class="text-white font-bold text-xl">Vetro Labs</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="luach-ai-forge.html" class="text-gray-300 hover:text-white transition-colors">Luach AI Forge</a>
+                <a href="try-vetrogpt.html" class="text-gray-300 hover:text-white transition-colors">Try VetroGPT</a>
+                <a href="code-forge.html" class="text-gray-300 hover:text-white transition-colors">Code Forge</a>
+                <a href="smart-deploy.html" class="text-blue-400 font-medium">Smart Deploy</a>
+                <a href="analytics-ai.html" class="text-gray-300 hover:text-white transition-colors">Analytics AI</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-5xl font-bold text-white mb-4">
+                    <span class="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+                        Smart Deploy
+                    </span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    AI-powered deployment automation. Deploy to any cloud platform with intelligent optimization, monitoring, and rollback capabilities.
+                </p>
+            </div>
+
+            <!-- Main Dashboard -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Deployment Center -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Quick Deploy -->
+                    <div class="glass rounded-2xl p-6">
+                        <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                            <i class="fas fa-rocket text-green-400 mr-3"></i>
+                            Quick Deploy
+                        </h2>
+                        
+                        <!-- Platform Selection -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-white mb-4">Select Deployment Platform</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="platform-card glass p-4 rounded-xl text-center selected" data-platform="vercel">
+                                    <i class="fas fa-bolt text-white text-2xl mb-2"></i>
+                                    <div class="text-white font-medium">Vercel</div>
+                                    <div class="text-gray-400 text-sm">Frontend</div>
+                                </div>
+                                <div class="platform-card glass p-4 rounded-xl text-center" data-platform="aws">
+                                    <i class="fab fa-aws text-orange-400 text-2xl mb-2"></i>
+                                    <div class="text-white font-medium">AWS</div>
+                                    <div class="text-gray-400 text-sm">Full Stack</div>
+                                </div>
+                                <div class="platform-card glass p-4 rounded-xl text-center" data-platform="gcp">
+                                    <i class="fab fa-google text-blue-400 text-2xl mb-2"></i>
+                                    <div class="text-white font-medium">GCP</div>
+                                    <div class="text-gray-400 text-sm">Cloud</div>
+                                </div>
+                                <div class="platform-card glass p-4 rounded-xl text-center" data-platform="azure">
+                                    <i class="fab fa-microsoft text-blue-300 text-2xl mb-2"></i>
+                                    <div class="text-white font-medium">Azure</div>
+                                    <div class="text-gray-400 text-sm">Enterprise</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Deployment Settings -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-gray-300 mb-2">Repository URL</label>
+                                <input type="text" placeholder="https://github.com/username/repo" 
+                                       class="w-full p-3 bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-gray-300 mb-2">Branch</label>
+                                <select class="w-full p-3 bg-gray-800 text-white rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none">
+                                    <option>main</option>
+                                    <option>develop</option>
+                                    <option>staging</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button id="deployBtn" class="w-full p-4 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-all font-semibold text-lg">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Deploy Now
+                        </button>
+                    </div>
+
+                    <!-- Recent Deployments -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-6 flex items-center">
+                            <i class="fas fa-history text-blue-400 mr-2"></i>
+                            Recent Deployments
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="deployment-card success glass p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center">
+                                        <span class="status-indicator success"></span>
+                                        <span class="text-white font-medium">vetro-app-v2.1.0</span>
+                                    </div>
+                                    <span class="text-gray-400 text-sm">2 minutes ago</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-400 mb-2">
+                                    <span>Production deployment completed</span>
+                                    <span>Vercel</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="deployment-card failed glass p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center">
+                                        <span class="status-indicator failed"></span>
+                                        <span class="text-white font-medium">vetro-app-v2.0.9</span>
+                                    </div>
+                                    <span class="text-gray-400 text-sm">1 hour ago</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-400 mb-2">
+                                    <span>Build failed - TypeScript errors</span>
+                                    <span>AWS</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="deployment-card deploying glass p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center">
+                                        <span class="status-indicator deploying"></span>
+                                        <span class="text-white font-medium">vetro-app-v2.1.1</span>
+                                    </div>
+                                    <span class="text-gray-400 text-sm">Deploying...</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm text-gray-400 mb-2">
+                                    <span>Staging deployment in progress</span>
+                                    <span>GCP</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deployment Logs -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4 flex items-center">
+                            <i class="fas fa-terminal text-gray-400 mr-2"></i>
+                            Deployment Logs
+                        </h3>
+                        
+                        <div class="bg-gray-900 rounded-lg p-4 h-64 overflow-y-auto">
+                            <div class="space-y-1">
+                                <div class="log-entry info">
+                                    <span class="text-blue-400">[INFO]</span> Starting deployment process...
+                                </div>
+                                <div class="log-entry info">
+                                    <span class="text-blue-400">[INFO]</span> Cloning repository from GitHub
+                                </div>
+                                <div class="log-entry success">
+                                    <span class="text-green-400">[SUCCESS]</span> Repository cloned successfully
+                                </div>
+                                <div class="log-entry info">
+                                    <span class="text-blue-400">[INFO]</span> Installing dependencies...
+                                </div>
+                                <div class="log-entry info">
+                                    <span class="text-blue-400">[INFO]</span> Running build process...
+                                </div>
+                                <div class="log-entry success">
+                                    <span class="text-green-400">[SUCCESS]</span> Build completed successfully
+                                </div>
+                                <div class="log-entry info">
+                                    <span class="text-blue-400">[INFO]</span> Deploying to Vercel...
+                                </div>
+                                <div class="log-entry success">
+                                    <span class="text-green-400">[SUCCESS]</span> Deployment completed!
+                                </div>
+                                <div class="log-entry info">
+                                    <span class="text-blue-400">[INFO]</span> URL: https://vetro-app-2-1-0.vercel.app
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mt-4">
+                            <button class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-download mr-2"></i>
+                                Export Logs
+                            </button>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-sync mr-2"></i>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Deployment Metrics -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Deployment Metrics</h3>
+                        <div id="deploymentChart" class="h-48"></div>
+                    </div>
+
+                    <!-- Performance Stats -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Performance</h3>
+                        <div class="space-y-4">
+                            <div class="metric-card p-3 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-300 text-sm">Avg Deploy Time</span>
+                                    <span class="text-white font-bold">2m 34s</span>
+                                </div>
+                                <div class="text-green-400 text-xs mt-1">↓ 15% from last week</div>
+                            </div>
+                            
+                            <div class="metric-card p-3 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-300 text-sm">Success Rate</span>
+                                    <span class="text-white font-bold">94.7%</span>
+                                </div>
+                                <div class="text-green-400 text-xs mt-1">↑ 2.3% from last week</div>
+                            </div>
+                            
+                            <div class="metric-card p-3 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-300 text-sm">Total Deployments</span>
+                                    <span class="text-white font-bold">127</span>
+                                </div>
+                                <div class="text-blue-400 text-xs mt-1">This month</div>
+                            </div>
+                            
+                            <div class="metric-card p-3 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-300 text-sm">Active Services</span>
+                                    <span class="text-white font-bold">8</span>
+                                </div>
+                                <div class="text-purple-400 text-xs mt-1">Across 4 platforms</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button class="w-full p-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all text-left">
+                                <i class="fas fa-undo mr-2"></i>
+                                Rollback to v2.0.8
+                            </button>
+                            <button class="w-full p-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all text-left">
+                                <i class="fas fa-sync mr-2"></i>
+                                Redeploy Failed
+                            </button>
+                            <button class="w-full p-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all text-left">
+                                <i class="fas fa-cog mr-2"></i>
+                                Configure Auto-deploy
+                            </button>
+                            <button class="w-full p-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all text-left">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                View Analytics
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Environment Status -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">Environment Status</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="status-indicator success"></span>
+                                    <span class="text-white">Production</span>
+                                </div>
+                                <span class="text-green-400 text-sm">Healthy</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="status-indicator success"></span>
+                                    <span class="text-white">Staging</span>
+                                </div>
+                                <span class="text-green-400 text-sm">Healthy</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="status-indicator deploying"></span>
+                                    <span class="text-white">Development</span>
+                                </div>
+                                <span class="text-yellow-400 text-sm">Deploying</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="status-indicator success"></span>
+                                    <span class="text-white">Testing</span>
+                                </div>
+                                <span class="text-green-400 text-sm">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Deployment functionality
+        let selectedPlatform = 'vercel';
+        let deploymentInProgress = false;
+
+        // Platform selection
+        document.querySelectorAll('.platform-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPlatform = this.dataset.platform;
+            });
+        });
+
+        // Deploy button functionality
+        document.getElementById('deployBtn').addEventListener('click', function() {
+            if (deploymentInProgress) return;
+            
+            deploymentInProgress = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Deploying...';
+            this.disabled = true;
+            
+            // Simulate deployment process
+            simulateDeployment();
+        });
+
+        function simulateDeployment() {
+            const steps = [
+                { message: 'Initializing deployment...', duration: 1000 },
+                { message: 'Cloning repository...', duration: 2000 },
+                { message: 'Installing dependencies...', duration: 3000 },
+                { message: 'Building application...', duration: 4000 },
+                { message: 'Running tests...', duration: 2000 },
+                { message: 'Deploying to ' + selectedPlatform + '...', duration: 3000 },
+                { message: 'Deployment completed successfully!', duration: 1000 }
+            ];
+            
+            let currentStep = 0;
+            
+            function processStep() {
+                if (currentStep < steps.length) {
+                    addLogEntry(steps[currentStep].message, 'info');
+                    
+                    setTimeout(() => {
+                        currentStep++;
+                        processStep();
+                    }, steps[currentStep].duration);
+                } else {
+                    // Deployment completed
+                    deploymentInProgress = false;
+                    const deployBtn = document.getElementById('deployBtn');
+                    deployBtn.innerHTML = '<i class="fas fa-rocket mr-2"></i>Deploy Now';
+                    deployBtn.disabled = false;
+                    
+                    // Add success deployment card
+                    addDeploymentCard();
+                    
+                    // Show success notification
+                    showNotification('Deployment completed successfully!', 'success');
+                }
+            }
+            
+            processStep();
+        }
+
+        function addLogEntry(message, type) {
+            const logContainer = document.querySelector('.bg-gray-900 .space-y-1');
+            const logEntry = document.createElement('div');
+            logEntry.className = \`log-entry \${type}\`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const typeColors = {
+                info: 'text-blue-400',
+                success: 'text-green-400',
+                error: 'text-red-400',
+                warning: 'text-yellow-400'
+            };
+            
+            logEntry.innerHTML = \`
+                <span class="\${typeColors[type]}">[\${type.toUpperCase()}]</span>
+                <span class="text-gray-500">\${timestamp}</span>
+                \${message}
+            \`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Animate entry
+            anime({
+                targets: logEntry,
+                opacity: [0, 1],
+                translateX: [-20, 0],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        function addDeploymentCard() {
+            const deploymentsContainer = document.querySelector('.space-y-4');
+            const deploymentCard = document.createElement('div');
+            deploymentCard.className = 'deployment-card deploying glass p-4 rounded-lg';
+            
+            const version = \`vetro-app-v2.1.\${Math.floor(Math.random() * 10) + 2}\`;
+            
+            deploymentCard.innerHTML = \`
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <span class="status-indicator deploying"></span>
+                        <span class="text-white font-medium">\${version}</span>
+                    </div>
+                    <span class="text-gray-400 text-sm">Just now</span>
+                </div>
+                <div class="flex items-center justify-between text-sm text-gray-400 mb-2">
+                    <span>Deployment in progress</span>
+                    <span>\${selectedPlatform}</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%"></div>
+                </div>
+            \`;
+            
+            deploymentsContainer.insertBefore(deploymentCard, deploymentsContainer.firstChild);
+            
+            // Animate progress
+            setTimeout(() => {
+                const progressFill = deploymentCard.querySelector('.progress-fill');
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    deploymentCard.classList.remove('deploying');
+                    deploymentCard.classList.add('success');
+                    const statusIndicator = deploymentCard.querySelector('.status-indicator');
+                    statusIndicator.classList.remove('deploying');
+                    statusIndicator.classList.add('success');
+                    
+                    deploymentCard.querySelector('.text-gray-400').textContent = 'Just completed';
+                }, 2000);
+            }, 100);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = \`fixed top-24 right-6 p-4 rounded-lg text-white z-50 \${
+                type === 'success' ? 'bg-green-600' : 
+                type === 'error' ? 'bg-red-600' : 
+                'bg-blue-600'
+            }\`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            anime({
+                targets: notification,
+                opacity: [0, 1],
+                translateX: [100, 0],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+            
+            setTimeout(() => {
+                anime({
+                    targets: notification,
+                    opacity: [1, 0],
+                    translateX: [0, 100],
+                    duration: 300,
+                    easing: 'easeInQuad',
+                    complete: () => notification.remove()
+                });
+            }, 3000);
+        }
+
+        // Initialize deployment chart
+        function initDeploymentChart() {
+            const data = [{
+                x: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                y: [12, 8, 15, 10, 18, 6, 9],
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Deployments',
+                line: { color: '#3b82f6', width: 3 },
+                marker: { color: '#8b5cf6', size: 8 }
+            }];
+
+            const layout = {
+                title: { text: 'Weekly Deployments', font: { color: 'white', size: 16 } },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { color: 'white' },
+                xaxis: { color: 'white', gridcolor: 'rgba(255,255,255,0.1)' },
+                yaxis: { color: 'white', gridcolor: 'rgba(255,255,255,0.1)' },
+                margin: { t: 40, r: 20, b: 40, l: 40 }
+            };
+
+            Plotly.newPlot('deploymentChart', data, layout, { displayModeBar: false, responsive: true });
+        }
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 12 + 's';
+                particle.style.animationDuration = (Math.random() * 6 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initDeploymentChart();
+            createParticles();
+            
+            // Animate elements on load
+            anime({
+                targets: '.glass',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 1000,
+                delay: anime.stagger(200),
+                easing: 'easeOutQuad'
+            });
+
+            anime({
+                targets: '.platform-card',
+                opacity: [0, 1],
+                scale: [0.8, 1],
+                duration: 800,
+                delay: anime.stagger(100, {start: 800}),
+                easing: 'easeOutQuad'
+            });
+
+            anime({
+                targets: '.deployment-card',
+                opacity: [0, 1],
+                translateX: [-30, 0],
+                duration: 800,
+                delay: anime.stagger(150, {start: 1200}),
+                easing: 'easeOutQuad'
+            });
+        });
+    </script>
+<script>
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            e.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>
